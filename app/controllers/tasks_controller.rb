@@ -1,7 +1,7 @@
 class TasksController < ApplicationController
   
   def index
-    @tasks = Task.all
+    @pagy, @tasks = pagy(Task.all)
   end
 
   def show
@@ -45,7 +45,7 @@ class TasksController < ApplicationController
     @task.destroy
 
     flash[:success] = 'タスクが削除されました'
-    redirect_to tasks_path
+    redirect_to tasks_url
   end
   
   private
