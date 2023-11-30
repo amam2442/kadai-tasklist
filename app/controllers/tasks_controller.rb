@@ -1,7 +1,10 @@
 class TasksController < ApplicationController
-  
+  before_action :require_user_logged_in
   def index
-    @pagy, @tasks = pagy(Task.all)
+    if logged_in?
+      @tasks = current_user.tasks.build  # form_with 用
+      @pagy, @tasks = pagy(current_user.tasks.order(id: :desc))
+    end
   end
 
   def show
@@ -13,13 +16,13 @@ class TasksController < ApplicationController
   end
 
   def create
-    @task = Task.new(task_params)
-
+    @task= current_user.tasks.build(task_params)
     if @task.save
-      flash[:success] = 'タスクが投稿されました'
-      redirect_to @task
+      flash[:success] = 'メッセージを投稿しました。'
+      redirect_to root_url
     else
-      flash[:danger] = 'タスクが投稿されません'
+      @pagy, @tasks = pagy(current_user.tasks.order(id: :desc))
+      flash.now[:danger] = 'メッセージの投稿に失敗しました。'
       render :new
     end
   end
